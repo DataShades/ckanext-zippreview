@@ -1,16 +1,9 @@
 {% extends "dataviewer/base.html" %}
 
 {%- block styles %}
-  {% resource g.main_css[6:] %}
-
-  {% set type = "asset" if h.ckan_version() > "2.9" else "resource" %}
-  {% include "snippets/zippreview_" ~ type ~ ".html" %}
+  {% set type = "asset" if h.ckan_version() > "2.8" else "resource" %}
+  {% include "snippets/zippreview_resource.html" %}
 {% endblock %}
-{%- block scripts %}
-  {% if g.tracking_enabled %}
-    {% resource "base/tracking.js" %}
-  {% endif %}
-{% endblock -%}
 
 {% block page %}
   <div class="homepage layout-3">

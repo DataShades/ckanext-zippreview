@@ -1,2 +1,5 @@
 {% resource "ckanext-zippreview/main" %}
-{% resource "ckanext-zippreview/ckan" %}
+{% resource g.main_css[6:] %}
+{% if g.tracking_enabled %}
+    {% resource "base/tracking.js" %}
+{% endif %}

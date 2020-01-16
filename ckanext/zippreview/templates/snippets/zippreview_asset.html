@@ -1,1 +1,5 @@
 {% asset 'ckanext-zippreview/zippreview_css' %}
+{% asset g.main_css[6:-4] %}
+{% if g.tracking_enabled %}
+    {% asset "base/tracking.js" %}
+{% endif %}
