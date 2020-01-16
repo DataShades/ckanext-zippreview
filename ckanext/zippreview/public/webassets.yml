@@ -1,0 +1,4 @@
+zippreview_css:
+  output: ckanext-zippreview/zippreview_css.css
+  contents:
+    - zippreview.css
