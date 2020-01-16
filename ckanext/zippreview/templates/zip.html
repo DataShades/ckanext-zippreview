@@ -2,7 +2,7 @@
 
 {%- block styles %}
   {% set type = "asset" if h.ckan_version() > "2.9" else "resource" %}
-  {% include "snippets/zippreview_resource.html" %}
+  {% include 'snippets/zippreview_' ~ type ~ '.html' %}
 {% endblock %}
 
 {% block page %}
