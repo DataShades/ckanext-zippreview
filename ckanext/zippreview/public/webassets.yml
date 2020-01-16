@@ -1,4 +1,8 @@
 zippreview_css:
   output: ckanext-zippreview/zippreview_css.css
+  extra:
+    preload:
+      - vendor/vendor
+      - vendor/bootstrap
   contents:
     - zippreview.css
