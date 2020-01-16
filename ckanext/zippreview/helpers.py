@@ -9,7 +9,10 @@ import logging
 import re
 import urllib
 
-from StringIO import StringIO
+if six.PY3:
+    from io import StringIO
+else:
+    from StringIO import StringIO
 from collections import OrderedDict
 
 from ckan.lib import uploader, formatters
