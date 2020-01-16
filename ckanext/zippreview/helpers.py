@@ -1,15 +1,19 @@
+from future import standard_library
+standard_library.install_aliases()
+    
 import requests
 import zipfile
 import struct
 import sys
 import logging
 import re
-import io
-import urllib.request
+import urllib
 
+from StringIO import StringIO
 from collections import OrderedDict
 
 from ckan.lib import uploader, formatters
+
 
 log = logging.getLogger(__name__)
 
@@ -60,6 +64,7 @@ def zip_tree(rsc):
 
     return tree.values()
 
+
 def _get_icon(item):
     extension = item.split(".")[-1].lower()
     if extension in ["xml", "txt", "json"]:
@@ -69,6 +74,7 @@ def _get_icon(item):
     if extension in ["shp", "geojson", "kml", "kmz"]:
         return "globe"
     return "file"
+
 
 def _zip_list(rsc):
     if rsc.get("url_type") == "upload":
@@ -86,42 +92,15 @@ def _zip_list(rsc):
         return _get_zip_list_from_url(rsc.get("url"))
     return None
 
+
 def _get_zip_list_from_url(url):
 
     def get_list(start):
         headers = {"Range": "bytes={}-{}".format(start, end)}
-        fp = io.StringIO(requests.get(url, headers=headers).content)
+
+        fp = StringIO(requests.get(url, headers=headers).content)
         zf = zipfile.ZipFile(fp)
         return zf.filelist
-
-    def get_list_advanced(url):
-        # https://superuser.com/questions/981301/is-there-a-way-to-download-parts-of-the-content-of-a-zip-file
-
-
-        offset = 0
-        _list = []
-
-        with _open_remote_zip(url) as fp:
-            header = fp.read(30)
-
-            while header[:4] == "PK\x03\x04":
-                compressed_len, uncompressed_len = struct.unpack(
-                    "<II", header[18:26])
-                filename_len, extra_len = struct.unpack("<HH", header[26:30])
-                header_len = 30 + filename_len + extra_len
-                total_len = header_len + compressed_len
-                filename = fp.read(filename_len)
-
-                zi = zipfile.ZipInfo(filename)
-                zi.file_size = uncompressed_len
-                _list.append(zi)
-                fp.close()
-
-                offset += total_len
-                fp = _open_remote_zip(url, offset)
-                header = fp.read(30)
-
-        return _list
 
     try:
         head = requests.head(url)
@@ -135,11 +114,43 @@ def _get_zip_list_from_url(url):
     except Exception as e:
         log.error("An error occured: {}".format(e))
     try:
-        return get_list_advanced(url)
+        return _get_list_advanced(url)
     except Exception as e:
         log.error("An error occured: {}".format(e))
         return None
 
+
 def _open_remote_zip(url, offset=0):
     headers = {"Range": "bytes={}-".format(offset)}
     return urllib.request.urlopen(urllib.request.Request(url, headers=headers))
+
+
+def _get_list_advanced(url):
+    # https://superuser.com/questions/981301/is-there-a-way-to-download-parts-of-the-content-of-a-zip-file
+
+
+    offset = 0
+    _list = []
+
+    fp = _open_remote_zip(url)
+    header = fp.read(30)
+
+    while header[:4] == "PK\x03\x04":
+        compressed_len, uncompressed_len = struct.unpack(
+            "<II", header[18:26])
+        filename_len, extra_len = struct.unpack("<HH", header[26:30])
+        header_len = 30 + filename_len + extra_len
+        total_len = header_len + compressed_len
+        filename = fp.read(filename_len)
+
+        zi = zipfile.ZipInfo(filename)
+        zi.file_size = uncompressed_len
+        _list.append(zi)
+        fp.close()
+
+        offset += total_len
+        fp = _open_remote_zip(url, offset)
+        header = fp.read(30)
+
+    fp.close()
+    return _list

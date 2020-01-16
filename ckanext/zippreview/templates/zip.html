@@ -1,6 +1,10 @@
 {% extends "dataviewer/base.html" %}
+
 {%- block styles %}
   {% resource g.main_css[6:] %}
+
+  {% set type = "asset" if h.ckan_version() > "2.9" else "resource" %}
+  {% include "snippets/zippreview_" ~ type ~ ".html" %}
 {% endblock %}
 {%- block scripts %}
   {% if g.tracking_enabled %}
@@ -41,6 +45,4 @@
     </div>
   </div>
 
-  {% set type = "asset" if h.ckan_version() > "2.9" else "resource" %}
-  {% include "snippets/zippreview_" ~ type ~ ".html" %}
 {% endblock %}
