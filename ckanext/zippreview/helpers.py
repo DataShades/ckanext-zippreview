@@ -128,8 +128,6 @@ def _open_remote_zip(url, offset=0):
 
 def _get_list_advanced(url):
     # https://superuser.com/questions/981301/is-there-a-way-to-download-parts-of-the-content-of-a-zip-file
-
-
     offset = 0
     _list = []
 
