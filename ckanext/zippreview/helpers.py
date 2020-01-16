@@ -8,6 +8,7 @@ import sys
 import logging
 import re
 import urllib
+import six
 
 if six.PY3:
     from io import StringIO
