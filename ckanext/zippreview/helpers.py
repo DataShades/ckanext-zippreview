@@ -10,7 +10,7 @@ import re
 import urllib
 import six
 
-from io import StringIO
+from io import BytesIO
 from collections import OrderedDict
 
 from ckan.lib import uploader, formatters
@@ -99,7 +99,7 @@ def _get_zip_list_from_url(url):
     def get_list(start):
         headers = {"Range": "bytes={}-{}".format(start, end)}
 
-        fp = StringIO(requests.get(url, headers=headers).content)
+        fp = BytesIO(requests.get(url, headers=headers).content)
         zf = zipfile.ZipFile(fp)
         return zf.filelist
 
